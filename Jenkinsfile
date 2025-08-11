@@ -1,37 +1,29 @@
-pipeline {
+pipeline{
     agent any
     tools{
-        maven 'maven_3_5_0'
+        maven 'maven'
     }
     stages{
-        stage('Build Maven'){
+        stage('Build maven project'){
             steps{
-                checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Java-Techie-jt/devops-automation']]])
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Mjsentiment/devops-automation-intergration.git']])
                 sh 'mvn clean install'
             }
         }
         stage('Build docker image'){
             steps{
                 script{
-                    sh 'docker build -t javatechie/devops-integration .'
+                    sh 'sudo docker build -t mikedevop/devops-integration .'
                 }
             }
         }
-        stage('Push image to Hub'){
+        stage('push image to docker hub'){
             steps{
                 script{
-                   withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) {
-                   sh 'docker login -u javatechie -p ${dockerhubpwd}'
-
+                    withCredentials([string(credentialsId: 'dockerhubpwd', variable: 'dockerhubpwd')]) {
+                    sh 'docker login -u mikedevop -p ${dockerhubpwd}'
 }
-                   sh 'docker push javatechie/devops-integration'
-                }
-            }
-        }
-        stage('Deploy to k8s'){
-            steps{
-                script{
-                    kubernetesDeploy (configs: 'deploymentservice.yaml',kubeconfigId: 'k8sconfigpwd')
+                    sh 'docker push mikedevop/devops-integration'
                 }
             }
         }
