@@ -1,1 +1,2 @@
 I have make some changes in the Jenksinsfile
+I am going to do a build trigger with github to jenkins to build maven project, build a docker image and then push images to dockerhub
